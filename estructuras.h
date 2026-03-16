@@ -14,15 +14,15 @@ struct radartramo {
     cadena ficheropunto2;
 };
 
-struct lecturavehiculo {
-    cadena matricula;
-    tlectura lec;
-};
-
 // Para la lectura de tiempo
 struct tfecha{int dia; int mes; int anio;};
 struct thora{int hora; int min; int sec;};
 struct tlectura{tfecha fecha; thora hora;};
+
+struct lecturavehiculo {
+    cadena matricula;
+    tlectura lec;
+};
 
 struct coche {
     cadena matricula;

@@ -5,7 +5,7 @@
 GestorSanciones(cadena nFSanciones, cadena nFRadares, cadena nFVehiculos, cadena nFTipoSancion) {
 
 };
-bool getFicheroSancionesActivo();
+bool getFicheroSancionesActivo(){};
 void getNomFicheroVehiculos(cadena nF);
 void getNomFicheroTipoSancion(cadena nF);
 void mostrarRadares();
