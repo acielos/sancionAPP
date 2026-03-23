@@ -1,8 +1,9 @@
 #include "GestorSanciones.h"
 #include "estructuras.h"
 
-~GestorSanciones();
-GestorSanciones(cadena nFSanciones, cadena nFRadares, cadena nFVehiculos, cadena nFTipoSancion) {
+//~GestorSanciones();
+
+void GestorSanciones(cadena nFSanciones, cadena nFRadares, cadena nFVehiculos, cadena nFTipoSancion) {
 
 };
 bool getFicheroSancionesActivo(){};
