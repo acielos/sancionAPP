@@ -1,5 +1,5 @@
-#ifndef SANCIONAPP_ESTRUCTURAS_H
-#define SANCIONAPP_ESTRUCTURAS_H
+#ifndef SANCIONAPP_TIPOS_H
+#define SANCIONAPP_TIPOS_H
 
 typedef char cadena[50];
 
@@ -46,4 +46,4 @@ struct tipossanciones {
     int puntositv;
 };
 
-#endif //SANCIONAPP_ESTRUCTURAS_H
+#endif //SANCIONAPP_TIPOS_H

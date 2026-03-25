@@ -1,8 +1,23 @@
 #include <iostream>
+#include <fstream>
 
-#include "estructuras.h"
+#include "GestorSanciones.h"
+#include "tipos.h"
 
 int main() {
+    // Guardamos el nombre de los ficheros por si necesitamos usarlos mas adelante
+    cadena sanciones = "Utils/sanciones.dat";
+    cadena radares = "Utils/r11";
+    cadena vehiculos = "Utils/coches.dat";
+    cadena tipos = "Utils/tipossancion.dat";
+
+    // Creamos el objeto
+    GestorSanciones gs(sanciones, radares, vehiculos, tipos);
+
+    // Comprobamos que se haya abierto correctamente
+    if (!gs.getFicheroSancionesActivo()) {
+        std::cout << "\n\nERROR -- ERROR AL ABRIR EL FICHERO\n\n";
+    }
 
     int opcion = 0;
 

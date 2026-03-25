@@ -3,7 +3,7 @@
 
 #include <iosfwd>
 #include <fstream>
-#include "estructuras.h"
+#include "tipos.h"
 
 class GestorSanciones {
     std::fstream ficheroSanciones;//flujo de acceso al fichero de sanciones.
@@ -27,6 +27,9 @@ public:
     bool anyadirVehiculo(coche v);
     bool mostrarTipoSancion(int a);
     void mostrarSanciones();
+
+    // Métodos propios
+    void extraerMatricula(cadena m);
 };
 
 
