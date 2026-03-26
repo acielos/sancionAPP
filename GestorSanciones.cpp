@@ -105,6 +105,11 @@ bool GestorSanciones::mostrarRadar(int c) {
                 ficheroRadares.read((char*)&radar, sizeof(radar));
             }
         }
+
+        if (ficheroRadares.eof()) {
+            std::cout << std::endl;
+            std::cout << " No se ha encontrado el radar solicitado" << std::endl;
+        }
     }
 };
 
