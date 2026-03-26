@@ -4,7 +4,11 @@
 #include <cstdlib>
 #include <iostream>
 
-GestorSanciones::~GestorSanciones(){};
+GestorSanciones::~GestorSanciones() {
+    if (getFicheroSancionesActivo()) {
+        ficheroSanciones.close();
+    }
+};
 
 GestorSanciones::GestorSanciones(cadena nFSanciones, cadena nFRadares, cadena nFVehiculos, cadena nFTipoSancion) {
 
@@ -18,7 +22,7 @@ GestorSanciones::GestorSanciones(cadena nFSanciones, cadena nFRadares, cadena nF
         ficheroSanciones.open(nFSanciones, std::ios::out | std::ios::binary);
         ficheroSanciones.close();
         ficheroSanciones.clear();
-        ficheroSanciones.open(nFRadares, std::ios::out | std::ios::binary);
+        ficheroSanciones.open(nFSanciones, std::ios::out | std::ios::in | std::ios::binary);
     }
 
     ficheroSancionesActivo = !ficheroSanciones.fail();
@@ -32,19 +36,84 @@ bool GestorSanciones::getFicheroSancionesActivo() {
 };
 
 void GestorSanciones::getNomFicheroVehiculos(cadena nF) {
-
+    std::strcpy(nF, nomFicheroVehiculos);
 };
 
 void GestorSanciones::getNomFicheroTipoSancion(cadena nF) {
-
+    std::strcpy(nF, nomFicheroTipoSancion);
 };
 
 void GestorSanciones::mostrarRadares() {
 
+    // Abrimos el fichero en modo binario
+    std::fstream ficheroRadares;
+
+    ficheroRadares.open(nomFicheroRadares,std::ios::binary | std::ios::in);
+
+    // Comprobamos que no falle la apertura del fichero
+    if (ficheroRadares.fail()) {
+        std::cout << "ERROR --  No hay radares registrados en el sistema" << std::endl;
+    } else {
+        radartramo radar{};
+        ficheroRadares.read((char*)&radar, sizeof(radar));
+        while (!ficheroRadares.eof()) {
+            std::cout << "     ***** RADARES *****" << std::endl;
+            std::cout << "=============================" << std::endl;
+            std::cout << "   - Nombre: " << radar.nombre << std::endl;
+            std::cout << "   - Código: " << radar.codigo << std::endl;
+            std::cout << "   - Provincia: " << radar.provincia << std::endl;
+            std::cout << "   - Localización: " << radar.localizacion << std::endl;
+            std::cout << "   - Velocidad Máxima: " << radar.velocidadMediaMaxima << std::endl;
+            ficheroRadares.read((char*)&radar, sizeof(radar));
+
+            std::cout << std::endl;
+            std::cout << std::endl;
+
+        }
+    }
 };
 
 bool GestorSanciones::mostrarRadar(int c) {
+    // Abrimos el fichero en modo binario
+    std::fstream ficheroRadares;
 
+    ficheroRadares.open(nomFicheroRadares,std::ios::binary | std::ios::in);
+
+    // Comprobamos que no falle la apertura del fichero
+    if (ficheroRadares.fail()) {
+        std::cout << "ERROR --  No hay radares registrados en el sistema" << std::endl;
+    } else {
+        bool encontrado = false;
+        // Consultamos al usuario el código del radar que quiere ver
+        int codigo;
+        std::cout << std::endl;
+        std::cout << " ***** CONSULTA RADAR ***** " << std::endl;
+        std::cout << " ========================== " << std::endl;
+        std::cout << " Por favor, introduzca el codigo a consultar: ";
+        std::cin >> codigo;
+
+        // Buscamos el radar en el fichero
+        radartramo radar{};
+        ficheroRadares.read((char*)&radar, sizeof(radar));
+        while (!ficheroRadares.eof() && !encontrado) {
+            if (radar.codigo == codigo) {
+                std::cout << std::endl;
+                std::cout << std::endl;
+                std::cout << "     ***** RADARES *****" << std::endl;
+                std::cout << "=============================" << std::endl;
+                std::cout << "   - Nombre: " << radar.nombre << std::endl;
+                std::cout << "   - Código: " << radar.codigo << std::endl;
+                std::cout << "   - Provincia: " << radar.provincia << std::endl;
+                std::cout << "   - Localización: " << radar.localizacion << std::endl;
+                std::cout << "   - Velocidad Máxima: " << radar.velocidadMediaMaxima << std::endl;
+                std::cout << std::endl;
+                std::cout << std::endl;
+                encontrado = true;
+            } else {
+                ficheroRadares.read((char*)&radar, sizeof(radar));
+            }
+        }
+    }
 };
 
 bool GestorSanciones::mostrarLecturasRadar(int c) {

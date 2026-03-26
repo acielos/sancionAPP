@@ -5,9 +5,10 @@
 #include "tipos.h"
 
 int main() {
+
     // Guardamos el nombre de los ficheros por si necesitamos usarlos mas adelante
     cadena sanciones = "Utils/sanciones.dat";
-    cadena radares = "Utils/r11";
+    cadena radares = "Utils/radares";
     cadena vehiculos = "Utils/coches.dat";
     cadena tipos = "Utils/tipossancion.dat";
 
@@ -17,6 +18,7 @@ int main() {
     // Comprobamos que se haya abierto correctamente
     if (!gs.getFicheroSancionesActivo()) {
         std::cout << "\n\nERROR -- ERROR AL ABRIR EL FICHERO\n\n";
+        exit(EXIT_FAILURE);
     }
 
     int opcion = 0;
@@ -49,10 +51,11 @@ int main() {
                 std::cout << std::endl << "Opción seleccionada: Añadir Vehiculo" << std::endl << std::endl;
                 break;
             case 3:
-                std::cout << std::endl << "Opción seleccionada: Mostrar Radares" << std::endl << std::endl;
+                gs.mostrarRadares();
                 break;
             case 4:
                 std::cout << std::endl << "Opción seleccionada: Mostrar Radar" << std::endl << std::endl;
+                gs.mostrarRadar(1);
                 break;
             case 5:
                 std::cout << std::endl << "Opción seleccionada: Procesar Radar" << std::endl << std::endl;
