@@ -84,19 +84,11 @@ bool GestorSanciones::mostrarRadar(int c) {
         std::cout << "ERROR --  No hay radares registrados en el sistema" << std::endl;
     } else {
         bool encontrado = false;
-        // Consultamos al usuario el código del radar que quiere ver
-        int codigo;
-        std::cout << std::endl;
-        std::cout << " ***** CONSULTA RADAR ***** " << std::endl;
-        std::cout << " ========================== " << std::endl;
-        std::cout << " Por favor, introduzca el codigo a consultar: ";
-        std::cin >> codigo;
-
         // Buscamos el radar en el fichero
         radartramo radar{};
         ficheroRadares.read((char*)&radar, sizeof(radar));
-        while (!ficheroRadares.eof() && !encontrado) {
-            if (radar.codigo == codigo) {
+        while (!ficheroRadares.eof()) {
+            if (radar.codigo == c) {
                 std::cout << std::endl;
                 std::cout << std::endl;
                 std::cout << "     ***** RADARES *****" << std::endl;
@@ -108,7 +100,7 @@ bool GestorSanciones::mostrarRadar(int c) {
                 std::cout << "   - Velocidad Máxima: " << radar.velocidadMediaMaxima << std::endl;
                 std::cout << std::endl;
                 std::cout << std::endl;
-                encontrado = true;
+                return true;
             } else {
                 ficheroRadares.read((char*)&radar, sizeof(radar));
             }
