@@ -31,6 +31,7 @@ GestorSanciones::GestorSanciones(cadena nFSanciones, cadena nFRadares, cadena nF
     std::strcpy(nomFicheroVehiculos, nFVehiculos);
     std::strcpy(nomFicheroTipoSancion, nFTipoSancion);
 };
+
 bool GestorSanciones::getFicheroSancionesActivo() {
     return ficheroSancionesActivo;
 };
@@ -71,6 +72,8 @@ void GestorSanciones::mostrarRadares() {
 
         }
     }
+
+    ficheroRadares.close();
 };
 
 bool GestorSanciones::mostrarRadar(int c) {
@@ -111,9 +114,14 @@ bool GestorSanciones::mostrarRadar(int c) {
             std::cout << " No se ha encontrado el radar solicitado" << std::endl;
         }
     }
+    ficheroRadares.close();
+    return false;
 };
 
 bool GestorSanciones::mostrarLecturasRadar(int c) {
+    std::fstream ficheroRadares;
+
+
 
 };
 
