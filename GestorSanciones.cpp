@@ -78,23 +78,24 @@ void GestorSanciones::mostrarRadares() {
 
 bool GestorSanciones::mostrarRadar(int c) {
     // Abrimos el fichero en modo binario
-    std::fstream ficheroRadares;
+    std::fstream mostrarRadar;
 
-    ficheroRadares.open(nomFicheroRadares,std::ios::binary | std::ios::in);
+    mostrarRadar.open(nomFicheroRadares,std::ios::binary | std::ios::in);
 
     // Comprobamos que no falle la apertura del fichero
-    if (ficheroRadares.fail()) {
+    if (mostrarRadar.fail()) {
         std::cout << "ERROR --  No hay radares registrados en el sistema" << std::endl;
+        return false;
     } else {
         bool encontrado = false;
         // Buscamos el radar en el fichero
         radartramo radar{};
-        ficheroRadares.read((char*)&radar, sizeof(radar));
-        while (!ficheroRadares.eof()) {
+        mostrarRadar.read((char*)&radar, sizeof(radar));
+        while (!mostrarRadar.eof()) {
             if (radar.codigo == c) {
                 std::cout << std::endl;
                 std::cout << std::endl;
-                std::cout << "     ***** RADARES *****" << std::endl;
+                std::cout << "     ***** RADAR *****" << std::endl;
                 std::cout << "=============================" << std::endl;
                 std::cout << "   - Nombre: " << radar.nombre << std::endl;
                 std::cout << "   - Código: " << radar.codigo << std::endl;
@@ -105,22 +106,28 @@ bool GestorSanciones::mostrarRadar(int c) {
                 std::cout << std::endl;
                 return true;
             } else {
-                ficheroRadares.read((char*)&radar, sizeof(radar));
+                mostrarRadar.read((char*)&radar, sizeof(radar));
             }
         }
 
-        if (ficheroRadares.eof()) {
+        if (mostrarRadar.eof()) {
             std::cout << std::endl;
             std::cout << " No se ha encontrado el radar solicitado" << std::endl;
         }
     }
-    ficheroRadares.close();
+    mostrarRadar.close();
     return false;
 };
 
 bool GestorSanciones::mostrarLecturasRadar(int c) {
-    std::fstream ficheroRadares;
+    std::fstream lecturasRadar;
 
+    // Pasamos el codigo a string para porder abrir el fichero
+    std::to_string(c);
+
+    std::string radar = "r" + c;
+
+    lecturasRadar.open(radar + "1", std::ios::binary | std::ios::in);
 
 
 };
@@ -130,7 +137,43 @@ bool GestorSanciones::procesarRadar(int c) {
 };
 
 bool GestorSanciones::mostrarVehiculo(cadena m) {
+    // Creamos el flujo
+    std::fstream mostrarVehiculo;
 
+    // Abrimos el archivo en el que vamos a buscar
+    mostrarVehiculo.open(nomFicheroVehiculos, std::ios::binary | std::ios::in);
+
+    // Si falla, pues fuera
+    if (mostrarVehiculo.fail()) {
+        std::cout << "ERROR --  No hay vehículos registrados en el sistema" << std::endl;
+        return false;
+    } else {
+        coche coche = {};
+        // Calculamos la posición en la que debería estar el vehículo
+        int pos = extraerMatricula(m) % 1000;
+
+        mostrarVehiculo.seekg(pos * sizeof(coche), std::ios::beg);
+        mostrarVehiculo.read((char*)&coche, sizeof(coche));
+
+        if (std::strcmp(coche.matricula, m) != 0) {
+            mostrarVehiculo.close();
+            return false;
+        }
+
+        std::cout << std::endl;
+        std::cout << std::endl;
+        std::cout << "     ***** VEHÍCULO *****" << std::endl;
+        std::cout << "=============================" << std::endl;
+        std::cout << "   - Matrícula: " << coche.matricula << std::endl;
+        std::cout << "   - Marca: " << coche.marca << std::endl;
+        std::cout << "   - Modelo: " << coche.modelo << std::endl;
+        // std::cout << "   - Fecha ITV: " << coche.fechaitv << std::endl;
+        std::cout << std::endl;
+        std::cout << std::endl;
+
+        mostrarVehiculo.close();
+        return true;
+    }
 };
 
 bool GestorSanciones::anyadirVehiculo(coche v) {
@@ -144,6 +187,17 @@ bool GestorSanciones::mostrarTipoSancion(int a) {
 void GestorSanciones::mostrarSanciones() {
 };
 
-void GestorSanciones::extraerMatricula(cadena m) {
+int GestorSanciones::extraerMatricula(cadena m) {
+    cadena numerico;
+    int contador = 0;
 
+    for (int i = 0; i < 7; i++) {
+        if (m[i] >= '0' && m[i] <= '9') {
+            numerico[contador] = m[i];
+            contador++;
+        }
+    }
+
+    numerico[contador] = '\0';
+    return atoi(numerico);
 };

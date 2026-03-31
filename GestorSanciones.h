@@ -29,7 +29,7 @@ public:
     void mostrarSanciones();
 
     // Métodos propios
-    void extraerMatricula(cadena m);
+    int extraerMatricula(cadena m);
 };
 
 

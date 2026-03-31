@@ -45,7 +45,14 @@ int main() {
             case 0:
                 break;
             case 1:
-                std::cout << std::endl << "Opción seleccionada: Consulta de Vehiculo" << std::endl << std::endl;
+                cadena matricula;
+                std::cout << std::endl;
+                std::cout << " ***** CONSULTA VEHÍCULO *****" << std::endl;
+                std::cout << " =============================" << std::endl;
+                std::cout << " Por favor, introduzca la matrícula a consultar: ";
+                std::cin >> matricula;
+                gs.mostrarVehiculo(matricula);
+
                 break;
             case 2:
                 std::cout << std::endl << "Opción seleccionada: Añadir Vehiculo" << std::endl << std::endl;
@@ -76,4 +83,5 @@ int main() {
 
     }while(opcion != 0);
 
+    return 0;
 }
