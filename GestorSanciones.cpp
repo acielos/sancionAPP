@@ -120,14 +120,25 @@ bool GestorSanciones::mostrarRadar(int c) {
 };
 
 bool GestorSanciones::mostrarLecturasRadar(int c) {
-    std::fstream lecturasRadar;
 
-    // Pasamos el codigo a string para porder abrir el fichero
-    std::to_string(c);
+    // Estructura del radar
+    radartramo radar{};
 
-    std::string radar = "r" + c;
+    // Comprobamos la existencia del radar que introduce el usuario
+    if (!mostrarRadar(c)) {
+        return false;
+    }
 
-    lecturasRadar.open(radar + "1", std::ios::binary | std::ios::in);
+    // Si lo hemos encontrado, guardamos los datos en nuestra estructura
+
+    // Abrimos el flujo para los dos ficheros que tenemos por radar
+    std::fstream lectura1, lectura2;
+
+    // Ficheros de las lecturas (abrimos)
+    lectura1.open(radar.ficheropunto1,std::ios::binary | std::ios::in);
+    lectura2.open(radar.ficheropunto2,std::ios::binary | std::ios::in);
+
+    //
 
 
 };
@@ -156,6 +167,7 @@ bool GestorSanciones::mostrarVehiculo(cadena m) {
         mostrarVehiculo.read((char*)&coche, sizeof(coche));
 
         if (std::strcmp(coche.matricula, m) != 0) {
+            std::cout << "ERROR -- No se ha encontrado el vehiculo solicitado " << std::endl;
             mostrarVehiculo.close();
             return false;
         }
@@ -177,11 +189,80 @@ bool GestorSanciones::mostrarVehiculo(cadena m) {
 };
 
 bool GestorSanciones::anyadirVehiculo(coche v) {
+    // Creamos el objeto
+    std::fstream annadirVehiculo;
 
+    // Abrimos el fichero
+    annadirVehiculo.open(nomFicheroVehiculos, std::ios::binary | std::ios::in | std::ios::out);
+
+    // Comprobamos que se haya abierto correctamente
+    if (annadirVehiculo.fail()) {
+        std::cout << "ERROR --  No hay vehículos registrados en el sistema" << std::endl;
+        return false;
+    }
+
+    // Comprobamos que el vehículo que queremos añadir no esté en el sistema
+    if (mostrarVehiculo(v.matricula)) {
+        std::cout << " ERROR -- Ya existe un vehículo en el sistema con la matrícula proporcionada" << std::endl;
+        return false;
+    }
+
+    // Si el vehículo no existe y hemos hecho todo bien, lo metemos
+    int pos = extraerMatricula(v.matricula) % 1000;
+
+    annadirVehiculo.seekp(pos * sizeof(coche), std::ios::beg);
+    annadirVehiculo.write((char*)&v, sizeof v);
+
+    // Si todo va bien, cerradmos y terminamos
+    annadirVehiculo.close();
+    return true;
 };
 
 bool GestorSanciones::mostrarTipoSancion(int a) {
+    // Creamos el flujo
+    std::fstream tipoSancion;
 
+    // Abrimos el archivo en el que vamos a buscar
+    tipoSancion.open(nomFicheroTipoSancion, std::ios::binary | std::ios::in);
+
+    // Si falla, pues fuera
+    if (tipoSancion.fail()) {
+        std::cout << "ERROR --  No hay sanciones registradas en el sistema (1)" << std::endl;
+        return false;
+    } else {
+        tipossanciones sancion = {};
+        // Calculamos la posición en la que debería estar el vehículo
+        int posSan = a % 2000;
+
+        tipoSancion.seekg(posSan * sizeof(sancion), std::ios::beg);
+        tipoSancion.read((char*)&sancion, sizeof(sancion));
+
+        if (tipoSancion.fail()) {
+            std::cout << "ERROR --  No hay sanciones registradas en el sistema (2)" << std::endl;
+            tipoSancion.close();
+            return false;
+        }
+
+        if (sancion.anio != a) {
+            std::cout << "ERROR -- No se ha encontrado la sancion solicitada (3)" << std::endl;
+            tipoSancion.close();
+            return false;
+        }
+
+        std::cout << std::endl;
+        std::cout << std::endl;
+        std::cout << "     ***** SANCIÓN *****" << std::endl;
+        std::cout << "============================" << std::endl;
+        std::cout << "   - Año: " << sancion.anio << std::endl;
+        std::cout << "   - Euros: " << sancion.eurosv[0] << ", " << sancion.eurosv[1] << ", " << sancion.eurosv[2] << std::endl;
+        std::cout << "   - Puntos velocidad: " << sancion.puntosv[0] << ", " << sancion.puntosv[1] << ", " << sancion.puntosv[2] << std::endl;
+        std::cout << "   - Puntos ITV: " << sancion.puntositv << std::endl;
+        std::cout << std::endl;
+        std::cout << std::endl;
+
+        tipoSancion.close();
+        return true;
+    }
 };
 
 void GestorSanciones::mostrarSanciones() {

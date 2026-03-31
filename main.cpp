@@ -10,7 +10,7 @@ int main() {
     cadena sanciones = "Utils/sanciones.dat";
     cadena radares = "Utils/radares";
     cadena vehiculos = "Utils/coches.dat";
-    cadena tipos = "Utils/tipossancion.dat";
+    cadena tipos = "Utils/tipossanciones.dat";
 
     // Creamos el objeto
     GestorSanciones gs(sanciones, radares, vehiculos, tipos);
@@ -22,6 +22,7 @@ int main() {
     }
 
     int opcion = 0;
+    coche annadir = {};
 
     do {
         std::cout << "     Sanciones APP. Menú Principal     " << std::endl;
@@ -45,17 +46,31 @@ int main() {
             case 0:
                 break;
             case 1:
-                cadena matricula;
+                cadena matriculaConsultar;
                 std::cout << std::endl;
                 std::cout << " ***** CONSULTA VEHÍCULO *****" << std::endl;
                 std::cout << " =============================" << std::endl;
                 std::cout << " Por favor, introduzca la matrícula a consultar: ";
-                std::cin >> matricula;
-                gs.mostrarVehiculo(matricula);
+                std::cin >> matriculaConsultar;
+                gs.mostrarVehiculo(matriculaConsultar);
 
                 break;
             case 2:
-                std::cout << std::endl << "Opción seleccionada: Añadir Vehiculo" << std::endl << std::endl;
+                std::cout << std::endl;
+                std::cout << " ***** AÑADIR VEHÍCULO *****" << std::endl;
+                std::cout << " ===========================" << std::endl;
+                std::cout << "  - Introduzca matrícula: ";
+                std::cin >> annadir.matricula;
+                // std::cout << "  - Introduzca Fecha ITV: ";
+                // std::cin >> anadir.fechaitv;
+                std::cout << "  - Introduzca marca: ";
+                std::cin >> annadir.marca;
+                std::cout << "  - Introduzca modelo: ";
+                std::cin >> annadir.modelo;
+
+                // Añadimos el vehñiculo
+                gs.anyadirVehiculo(annadir);
+
                 break;
             case 3:
                 gs.mostrarRadares();
@@ -77,7 +92,16 @@ int main() {
                 std::cout << std::endl << "Opción seleccionada: Mostrar Ficheros de Sanciones" << std::endl << std::endl;
                 break;
             case 7:
-                std::cout << std::endl << "Opción seleccionada: Mostrar Cuantía de Sancion" << std::endl << std::endl;
+                int anno;
+                std::cout << std::endl;
+                std::cout << " ***** CONSULTA SANCIONES ***** " << std::endl;
+                std::cout << " ============================== " << std::endl;
+                std::cout << " Por favor, introduzca el año a consultar: ";
+                std::cin >> anno;
+                std::cout << std::endl;
+                gs.mostrarTipoSancion(anno);
+                break;
+            default:
                 break;
         }
 
