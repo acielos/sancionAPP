@@ -87,7 +87,6 @@ bool GestorSanciones::mostrarRadar(int c) {
         std::cout << "ERROR --  No hay radares registrados en el sistema" << std::endl;
         return false;
     } else {
-        bool encontrado = false;
         // Buscamos el radar en el fichero
         radartramo radar{};
         mostrarRadar.read((char*)&radar, sizeof(radar));
@@ -120,26 +119,6 @@ bool GestorSanciones::mostrarRadar(int c) {
 };
 
 bool GestorSanciones::mostrarLecturasRadar(int c) {
-
-    // Estructura del radar
-    radartramo radar{};
-
-    // Comprobamos la existencia del radar que introduce el usuario
-    if (!mostrarRadar(c)) {
-        return false;
-    }
-
-    // Si lo hemos encontrado, guardamos los datos en nuestra estructura
-
-    // Abrimos el flujo para los dos ficheros que tenemos por radar
-    std::fstream lectura1, lectura2;
-
-    // Ficheros de las lecturas (abrimos)
-    lectura1.open(radar.ficheropunto1,std::ios::binary | std::ios::in);
-    lectura2.open(radar.ficheropunto2,std::ios::binary | std::ios::in);
-
-    //
-
 
 };
 

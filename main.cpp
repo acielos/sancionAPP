@@ -86,7 +86,14 @@ int main() {
                 gs.mostrarRadar(codigo);
                 break;
             case 5:
-                std::cout << std::endl << "Opción seleccionada: Procesar Radar" << std::endl << std::endl;
+                // Consultamos al usuario el código del radar que quiere ver
+                int cod5;
+                std::cout << std::endl;
+                std::cout << " ***** CONSULTA LECTURAS RADAR ***** " << std::endl;
+                std::cout << " =================================== " << std::endl;
+                std::cout << " Por favor, introduzca el codigo a consultar: ";
+                std::cin >> cod5;
+                gs.mostrarLecturasRadar(cod5);
                 break;
             case 6:
                 std::cout << std::endl << "Opción seleccionada: Mostrar Ficheros de Sanciones" << std::endl << std::endl;
