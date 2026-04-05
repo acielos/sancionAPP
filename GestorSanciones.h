@@ -30,6 +30,7 @@ public:
 
     // Métodos propios
     int extraerMatricula(cadena m);
+    bool comprobarRadar(int codigo);
 };
 
 

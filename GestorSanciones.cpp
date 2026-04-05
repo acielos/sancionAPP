@@ -119,6 +119,11 @@ bool GestorSanciones::mostrarRadar(int c) {
 };
 
 bool GestorSanciones::mostrarLecturasRadar(int c) {
+    // Primero deberemos comprobar si nuestro radar existe
+    if (comprobarRadar(c)) {
+        
+    }
+
 
 };
 
@@ -261,3 +266,29 @@ int GestorSanciones::extraerMatricula(cadena m) {
     numerico[contador] = '\0';
     return atoi(numerico);
 };
+
+bool GestorSanciones::comprobarRadar(int codigo) {
+
+    // creamos nuestro flujo
+    std::fstream ficheroRadares;
+
+    // Abrimos nuestro fichero de radares
+    ficheroRadares.open(nomFicheroRadares, std::ios::binary | std::ios::in);
+
+    // Comprobamos que no falle la apertura del archivo
+    if (ficheroRadares.fail()) {
+        std::cout << "\nERROR -- NO HAY RADARES REGISTRADOS EN EL SISTEMA" << std::endl;
+        return false;
+    } else {
+        radartramo radar = {};
+        ficheroRadares.read((char*)&radar, sizeof(radar));
+        while (!ficheroRadares.eof()) {
+            if (radar.codigo == codigo) {
+                return true;
+            } else {
+                ficheroRadares.read((char*)&radar, sizeof(radar));
+            }
+        }
+        return false;
+    }
+}
