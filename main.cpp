@@ -25,6 +25,7 @@ int main() {
     coche annadir = {};
 
     do {
+        std::cout << std::endl << std::endl;
         std::cout << "     Sanciones APP. Menú Principal     " << std::endl;
         std::cout << "=======================================" << std::endl;
         std::cout << "      1. Consulta Vehículo" << std::endl;

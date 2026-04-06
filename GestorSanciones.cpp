@@ -152,10 +152,11 @@ bool GestorSanciones::mostrarLecturasRadar(int c) {
                     }
 
                     std::cout << "***********************************************************" << std::endl;
-                    std::cout << "Código:  " << radar.codigo << "\t\t" << "Provincia: " << radar.provincia << "\t\t" << "Localizacion: " << radar.localizacion << std::endl;
-                    std::cout << "Nombre:  " << radar.nombre << "\t\t" << "Distancia (km): " << radar.distancia << "\t\t" << "Vel. Maxima (km/h): " << radar.velocidadMediaMaxima << std::endl;
+                    std::cout << "Código:  " << radar.codigo << "\t\t" << "Provincia: " << radar.provincia << "\t" << "Localizacion: " << radar.localizacion << std::endl;
+                    std::cout << "Nombre:  " << radar.nombre << "\t" << "Distancia (km): " << radar.distancia << "\t" << "Vel. Maxima (km/h): " << radar.velocidadMediaMaxima << std::endl;
                     std::cout << std::endl;
-                    std::cout << "Fichero 1:  " << radar.ficheropunto1 << "\t\t" << "Fichero 2: " << radar.ficheropunto2 << std::endl;
+                    std::cout << "Fichero de Lecturas (1): " << radar.ficheropunto1 << std::endl;
+                    std::cout << "Fichero de Lecturas (2): " << radar.ficheropunto2 << std::endl;
 
                     std::cout << std::endl;
                     std::cout << "----- CONTENIDO FICHERO LECTURAS -----" << std::endl;
