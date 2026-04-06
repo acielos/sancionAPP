@@ -34,11 +34,12 @@ int main() {
         std::cout << "      5. Procesar Radar" << std::endl;
         std::cout << "      6. Mostrar Fichero de Sanciones" << std::endl;
         std::cout << "      7. Mostrar Cuantía de Sanción" << std::endl;
+        std::cout << "      8. Mostrar Lecturas de Radar" << std::endl;
         std::cout << "      0. Salir" << std::endl;
         std::cout << std::endl;
         std::cout << "Seleccione una opción: "; std::cin >> opcion;
 
-        if (opcion < 0 || opcion > 7) {
+        if (opcion < 0 || opcion > 8) {
             std::cout << "ERROR: Por favor, introduzca una opción válida (0-7)" << std::endl;
         }
 
@@ -107,6 +108,16 @@ int main() {
                 std::cin >> anno;
                 std::cout << std::endl;
                 gs.mostrarTipoSancion(anno);
+                break;
+            case 8:
+                int codRa;
+                std::cout << std::endl;
+                std::cout << " ***** CONSULTA LECTURAS ***** " << std::endl;
+                std::cout << " ============================== " << std::endl;
+                std::cout << " Por favor, introduzca el codigo del radar a consultar: ";
+                std::cin >> codRa;
+                std::cout << std::endl;
+                gs.mostrarLecturasRadar(codRa);
                 break;
             default:
                 break;

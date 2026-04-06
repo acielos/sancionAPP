@@ -121,7 +121,82 @@ bool GestorSanciones::mostrarRadar(int c) {
 bool GestorSanciones::mostrarLecturasRadar(int c) {
     // Primero deberemos comprobar si nuestro radar existe
     if (comprobarRadar(c)) {
-        
+        std::fstream mostrarRadar;
+
+        mostrarRadar.open(nomFicheroRadares,std::ios::binary | std::ios::in);
+
+        // Comprobamos que no falle la apertura del fichero
+        if (mostrarRadar.fail()) {
+            std::cout << "ERROR --  No hay radares registrados en el sistema" << std::endl;
+            return false;
+        } else {
+            // Buscamos el radar en el fichero
+            radartramo radar{};
+            mostrarRadar.read((char*)&radar, sizeof(radar));
+            while (!mostrarRadar.eof()) {
+                if (radar.codigo == c) {
+                    std::fstream lectura1, lectura2;
+
+                    std::string fi1 = "Utils/" + (std::string)radar.ficheropunto1;
+                    std::string fi2 = "Utils/" + (std::string)radar.ficheropunto2;
+
+                    lectura1.open(fi1,std::ios::binary | std::ios::in);
+                    lectura2.open(fi2,std::ios::binary | std::ios::in);
+
+                    if (lectura1.fail()) {
+                        std::cout << "ERROR -- ERROR EN LAS LECTURAS DEL RADAR (1)" << std::endl;
+                    }
+
+                    if (lectura2.fail()) {
+                        std::cout << "ERROR -- ERROR EN LAS LECTURAS DEL RADAR (2)" << std::endl;
+                    }
+
+                    std::cout << "***********************************************************" << std::endl;
+                    std::cout << "Código:  " << radar.codigo << "\t\t" << "Provincia: " << radar.provincia << "\t\t" << "Localizacion: " << radar.localizacion << std::endl;
+                    std::cout << "Nombre:  " << radar.nombre << "\t\t" << "Distancia (km): " << radar.distancia << "\t\t" << "Vel. Maxima (km/h): " << radar.velocidadMediaMaxima << std::endl;
+                    std::cout << std::endl;
+                    std::cout << "Fichero 1:  " << radar.ficheropunto1 << "\t\t" << "Fichero 2: " << radar.ficheropunto2 << std::endl;
+
+                    std::cout << std::endl;
+                    std::cout << "----- CONTENIDO FICHERO LECTURAS -----" << std::endl;
+                    std::cout << std::endl;
+
+                    lecturavehiculo lec1{};
+                    lecturavehiculo lec2{};
+
+                    lectura1.read((char*)&lec1, sizeof(lec1));
+                    lectura2.read((char*)&lec2, sizeof(lec2));
+                    std::cout << "Fecha de las lecturas del fichero: " << lec1.lec.fecha.dia << "/" << lec1.lec.fecha.mes << "/" << lec1.lec.fecha.anio << std::endl << std::endl;
+                    std::cout << "                        Lectura (1)     Lectura (2)" << std::endl;
+
+                    while (!lectura1.eof() && !lectura2.eof()) {
+                        std::cout << "Matricula:  " << lec1.matricula << "\t\t" << lec1.lec.hora.hora << ":" << lec1.lec.hora.min << ":" << lec1.lec.hora.sec << "\t\t\t" << lec2.lec.hora.hora << ":" << lec2.lec.hora.min << ":" << lec2.lec.hora.sec << std::endl;
+
+                        lectura1.read((char*)&lec1, sizeof(lec1));
+                        lectura2.read((char*)&lec2, sizeof(lec2));
+
+                    }
+
+                    lectura1.close();
+                    lectura2.close();
+                    return true;
+                } else {
+                    mostrarRadar.read((char*)&radar, sizeof(radar));
+                }
+            }
+
+            if (mostrarRadar.eof()) {
+                std::cout << std::endl;
+                std::cout << " No se ha encontrado el radar solicitado" << std::endl;
+            }
+        }
+        mostrarRadar.close();
+        return false;
+
+
+    } else {
+        std::cout << "ERROR -- NO EXISTE EL RADAR SOLICITADO" << std::endl;
+        return false;
     }
 
 
