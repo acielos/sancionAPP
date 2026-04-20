@@ -91,14 +91,17 @@ int main() {
                 // Consultamos al usuario el código del radar que quiere ver
                 int cod5;
                 std::cout << std::endl;
-                std::cout << " ***** CONSULTA LECTURAS RADAR ***** " << std::endl;
-                std::cout << " =================================== " << std::endl;
-                std::cout << " Por favor, introduzca el codigo a consultar: ";
+                std::cout << " ***** PROCESAR RADAR ***** " << std::endl;
+                std::cout << " ========================== " << std::endl;
+                std::cout << " Por favor, introduzca el codigo del radar a procesar: ";
                 std::cin >> cod5;
-                gs.mostrarLecturasRadar(cod5);
+                gs.procesarRadar(cod5);
                 break;
             case 6:
-                std::cout << std::endl << "Opción seleccionada: Mostrar Ficheros de Sanciones" << std::endl << std::endl;
+                std::cout << std::endl;
+                std::cout << " ***** CONSULTA SANCIONES IMPUESTAS ***** " << std::endl;
+                std::cout << " ======================================== " << std::endl;
+                gs.mostrarSanciones();
                 break;
             case 7:
                 int anno;

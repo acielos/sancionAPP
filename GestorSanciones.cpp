@@ -1,7 +1,6 @@
 #include "GestorSanciones.h"
 #include "tipos.h"
 #include <fstream>
-#include <cstdlib>
 #include <iostream>
 
 GestorSanciones::~GestorSanciones() {
@@ -203,10 +202,6 @@ bool GestorSanciones::mostrarLecturasRadar(int c) {
 
 };
 
-bool GestorSanciones::procesarRadar(int c) {
-
-};
-
 bool GestorSanciones::mostrarVehiculo(cadena m) {
     // Creamos el flujo
     std::fstream mostrarVehiculo;
@@ -326,6 +321,53 @@ bool GestorSanciones::mostrarTipoSancion(int a) {
 };
 
 void GestorSanciones::mostrarSanciones() {
+    int anio;
+
+    std::cout << " Por favor, introduzca el año a consultar: ";
+    std::cin >> anio;
+
+    // Colocamos al prinipio
+    ficheroSanciones.clear();
+    ficheroSanciones.seekg(0, std::ios::beg);
+
+    sanciones sancion{};
+    ficheroSanciones.read((char*)&sancion, sizeof(sancion));
+
+    if (ficheroSanciones.eof()) {
+        std::cout << std::endl;
+        std::cout << " No hay sanciones registradas en el sistema." << std::endl;
+        std::cout << std::endl;
+        return;
+    }
+
+    int contador = 0;
+    while (!ficheroSanciones.eof()) {
+
+        // Solo mostramos las sanciones cuya fecha coincide con el año solicitado
+        if (sancion.fh.fecha.anio == anio) {
+            contador++;
+            std::cout << std::endl;
+            std::cout << " ***** SANCIÓN #" << contador << " *****" << std::endl;
+            std::cout << "================================" << std::endl;
+            std::cout << " - Matrícula:    " << sancion.matricula << std::endl;
+            std::cout << " - Cód. Radar:   " << sancion.codRadar << std::endl;
+            std::cout << " - Cuantía (€):  " << sancion.euros << std::endl;
+            std::cout << " - Puntos:       " << sancion.puntos << std::endl;
+            std::cout << " - Fecha/Hora:   " << sancion.fh.fecha.dia  << "/" << sancion.fh.fecha.mes  << "/" << sancion.fh.fecha.anio << "  " << sancion.fh.hora.hora  << ":" << sancion.fh.hora.min   << ":" << sancion.fh.hora.sec   << std::endl;
+            std::cout << std::endl;
+        }
+
+        ficheroSanciones.read((char*)&sancion, sizeof(sancion));
+    }
+
+    if (contador == 0) {
+        std::cout << std::endl;
+        std::cout << " No hay sanciones registradas para el año " << anio << "." << std::endl;
+        std::cout << std::endl;
+    } else {
+        std::cout << " Total sanciones año " << anio << ": " << contador << std::endl;
+        std::cout << std::endl;
+    }
 };
 
 int GestorSanciones::extraerMatricula(cadena m) {
@@ -368,3 +410,245 @@ bool GestorSanciones::comprobarRadar(int codigo) {
         return false;
     }
 }
+
+bool GestorSanciones::procesarRadar(int c) {
+
+    // Buscamos si existe el rada
+    std::fstream fichRadares;
+    fichRadares.open(nomFicheroRadares, std::ios::binary | std::ios::in);
+
+    if (fichRadares.fail()) {
+        std::cout << "ERROR -- No hay radares registrados en el sistema" << std::endl;
+        return false;
+    }
+
+    radartramo radar{};
+    bool radarEncontrado = false;
+
+    fichRadares.read((char*)&radar, sizeof(radar));
+    while (!fichRadares.eof()) {
+        if (radar.codigo == c) {
+            radarEncontrado = true;
+            break;
+        }
+        fichRadares.read((char*)&radar, sizeof(radar));
+    }
+    fichRadares.close();
+
+    if (!radarEncontrado) {
+        std::cout << "ERROR -- No se ha encontrado el radar con código " << c << std::endl;
+        return false;
+    }
+
+    // Abrimos los ficheros de las lecturas
+    std::fstream fLectura1, fLectura2;
+
+    std::string ruta1 = "Utils/" + std::string(radar.ficheropunto1);
+    std::string ruta2 = "Utils/" + std::string(radar.ficheropunto2);
+
+    fLectura1.open(ruta1, std::ios::binary | std::ios::in);
+    if (fLectura1.fail()) {
+        std::cout << "ERROR -- No se puede abrir el fichero de lecturas (punto 1)" << std::endl;
+        return false;
+    }
+
+    fLectura2.open(ruta2, std::ios::binary | std::ios::in);
+    if (fLectura2.fail()) {
+        std::cout << "ERROR -- No se puede abrir el fichero de lecturas (punto 2)" << std::endl;
+        fLectura1.close();
+        return false;
+    }
+
+    // Guardamos las lecturas
+    int capacidad     = 2;
+    int numLecturas2  = 0;
+    lecturavehiculo* vectorSalida = new lecturavehiculo[capacidad];
+
+    lecturavehiculo lecAux{};
+    fLectura2.read((char*)&lecAux, sizeof(lecAux));
+    while (!fLectura2.eof()) {
+        // Ampliamos
+        if (numLecturas2 == capacidad) {
+            capacidad += 2;
+            lecturavehiculo* vectorNuevo = new lecturavehiculo[capacidad];
+            for (int i = 0; i < numLecturas2; i++) {
+                vectorNuevo[i] = vectorSalida[i];
+            }
+            delete[] vectorSalida;
+            vectorSalida = vectorNuevo;
+        }
+        vectorSalida[numLecturas2] = lecAux;
+        numLecturas2++;
+        fLectura2.read((char*)&lecAux, sizeof(lecAux));
+    }
+    fLectura2.close();
+
+    // PRocesamos los vehículos
+    lecturavehiculo lecEntrada{};
+    fLectura1.read((char*)&lecEntrada, sizeof(lecEntrada));
+
+    while (!fLectura1.eof()) {
+
+        // Buscamos lectura
+        int idxSalida = -1;
+        for (int i = 0; i < numLecturas2; i++) {
+            if (std::strcmp(vectorSalida[i].matricula, lecEntrada.matricula) == 0) {
+
+                tlectura& lS = vectorSalida[i].lec;
+                tlectura& lE = lecEntrada.lec;
+                bool posterior = false;
+
+                if (lS.fecha.anio > lE.fecha.anio) {
+                    posterior = true;
+                } else if (lS.fecha.anio == lE.fecha.anio) {
+                    if (lS.fecha.mes > lE.fecha.mes) {
+                        posterior = true;
+                    } else if (lS.fecha.mes == lE.fecha.mes) {
+                        if (lS.fecha.dia > lE.fecha.dia) {
+                            posterior = true;
+                        } else if (lS.fecha.dia == lE.fecha.dia) {
+                            int segsE = lE.hora.hora * 3600 + lE.hora.min * 60 + lE.hora.sec;
+                            int segsS = lS.hora.hora * 3600 + lS.hora.min * 60 + lS.hora.sec;
+                            if (segsS > segsE) posterior = true;
+                        }
+                    }
+                }
+
+                if (posterior) {
+                    idxSalida = i;
+                    break;
+                }
+            }
+        }
+
+        // Vemos si hay infraccion
+        bool infraccionVelocidad = false;
+        int  franjaVelocidad     = -1;   // 0=leve  1=estándar  2=grave
+
+        if (idxSalida != -1) {
+            tlectura& lE = lecEntrada.lec;
+            tlectura& lS = vectorSalida[idxSalida].lec;
+
+            int segsE    = lE.hora.hora * 3600 + lE.hora.min * 60 + lE.hora.sec;
+            int segsS    = lS.hora.hora * 3600 + lS.hora.min * 60 + lS.hora.sec;
+            int tiempoSeg = segsS - segsE;
+
+            if (tiempoSeg > 0) {
+                float tiempoHoras  = tiempoSeg / 3600.0f;
+                float velocidadMedia = radar.distancia / tiempoHoras;
+                float vMax           = (float)radar.velocidadMediaMaxima;
+                float exceso         = velocidadMedia - vMax;
+
+                if (exceso > 0.0f) {
+                    float porcentaje = (exceso / vMax) * 100.0f;
+                    if      (porcentaje <= 10.0f) franjaVelocidad = 0;   // leve
+                    else if (porcentaje <= 20.0f) franjaVelocidad = 1;   // estándar
+                    else                          franjaVelocidad = 2;   // grave
+                    infraccionVelocidad = true;
+                }
+            }
+        }
+
+        // Miramos si cumole ITV
+        bool itvCaducada = false;
+        std::fstream fichVehiculos;
+        fichVehiculos.open(nomFicheroVehiculos, std::ios::binary | std::ios::in);
+
+        if (!fichVehiculos.fail()) {
+            coche vehiculo{};
+            int pos = extraerMatricula(lecEntrada.matricula) % 1000;
+            fichVehiculos.seekg(pos * (int)sizeof(coche), std::ios::beg);
+            fichVehiculos.read((char*)&vehiculo, sizeof(vehiculo));
+
+            if (!fichVehiculos.fail() && std::strcmp(vehiculo.matricula, lecEntrada.matricula) == 0) {
+                int anioRef, mesRef, diaRef;
+                if (idxSalida != -1) {
+                    anioRef = vectorSalida[idxSalida].lec.fecha.anio;
+                    mesRef  = vectorSalida[idxSalida].lec.fecha.mes;
+                    diaRef  = vectorSalida[idxSalida].lec.fecha.dia;
+                } else {
+                    anioRef = lecEntrada.lec.fecha.anio;
+                    mesRef  = lecEntrada.lec.fecha.mes;
+                    diaRef  = lecEntrada.lec.fecha.dia;
+                }
+
+                //C omprobamos ITV
+                if (vehiculo.fechaitv.anio < anioRef) {
+                    itvCaducada = true;
+                } else if (vehiculo.fechaitv.anio == anioRef) {
+                    if (vehiculo.fechaitv.mes < mesRef) {
+                        itvCaducada = true;
+                    } else if (vehiculo.fechaitv.mes == mesRef && vehiculo.fechaitv.dia < diaRef) {
+                        itvCaducada = true;
+                    }
+                }
+            }
+            fichVehiculos.close();
+        }
+
+        // Escribimos en el fichero la sancion
+        if (infraccionVelocidad || itvCaducada) {
+
+            int anioCaptura;
+            if (idxSalida != -1) {
+                anioCaptura = vectorSalida[idxSalida].lec.fecha.anio;
+            } else {
+                anioCaptura = lecEntrada.lec.fecha.anio;
+            }
+
+            std::fstream fichTipos;
+            fichTipos.open(nomFicheroTipoSancion, std::ios::binary | std::ios::in);
+
+            if (!fichTipos.fail()) {
+                tipossanciones tipoSancion{};
+                int posTipo = anioCaptura % 2000;
+                fichTipos.seekg(posTipo * (int)sizeof(tipossanciones), std::ios::beg);
+                fichTipos.read((char*)&tipoSancion, sizeof(tipoSancion));
+                fichTipos.close();
+
+                // Comprobamos el resgisto
+                if (!fichTipos.fail() && tipoSancion.anio == anioCaptura) {
+
+                    sanciones nuevaSancion{};
+                    std::strcpy(nuevaSancion.matricula, lecEntrada.matricula);
+                    nuevaSancion.codRadar = radar.codigo;
+                    nuevaSancion.euros    = 0.0f;
+                    nuevaSancion.puntos   = 0;
+
+                    // Fecha de la multa
+                    if (idxSalida != -1) {
+                        nuevaSancion.fh = vectorSalida[idxSalida].lec;
+                    } else {
+                        nuevaSancion.fh = lecEntrada.lec;
+                    }
+
+                    if (infraccionVelocidad && franjaVelocidad >= 0) {
+                        nuevaSancion.euros  += tipoSancion.eurosv[franjaVelocidad];
+                        nuevaSancion.puntos += tipoSancion.puntosv[franjaVelocidad];
+                    }
+                    if (itvCaducada) {
+                        // Guardamos la multa por la itv
+                        nuevaSancion.puntos += tipoSancion.puntositv;
+                    }
+
+                    // Escribimos en el ficheor de sanciones si hace falta
+                    ficheroSanciones.clear();
+                    ficheroSanciones.seekp(0, std::ios::end);
+                    ficheroSanciones.write((char*)&nuevaSancion, sizeof(nuevaSancion));
+                    ficheroSanciones.flush();
+                }
+            }
+        }
+
+        fLectura1.read((char*)&lecEntrada, sizeof(lecEntrada));
+    }
+
+    fLectura1.close();
+    delete[] vectorSalida;
+
+    std::cout << std::endl;
+    std::cout << " Radar " << c << " procesado correctamente." << std::endl;
+    std::cout << std::endl;
+
+    return true;
+};
